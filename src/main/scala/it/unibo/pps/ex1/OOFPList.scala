@@ -1,4 +1,4 @@
-package ex1
+package it.unibo.pps.ex1
 
 // List as a pure interface
 enum List[A]:

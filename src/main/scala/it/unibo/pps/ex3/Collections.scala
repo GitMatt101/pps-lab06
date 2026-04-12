@@ -1,4 +1,4 @@
-package ex3
+package it.unibo.pps.ex3
 
 import java.util.concurrent.TimeUnit
 
