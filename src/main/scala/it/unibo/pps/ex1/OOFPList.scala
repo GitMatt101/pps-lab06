@@ -46,14 +46,27 @@ enum List[A]:
     case h :: t => t.foldLeft(h)(op)
   
   // Exercise: implement the following methods
-  def zipWithValue[B](value: B): List[(A, B)] = ???
-  def length(): Int = ???
-  def indices(): List[Int] = ???
-  def zipWithIndex: List[(A, Int)] = ???
-  def partition(predicate: A => Boolean): (List[A], List[A]) = ???
-  def span(predicate: A => Boolean): (List[A], List[A]) = ???
-  def takeRight(n: Int): List[A] = ???
-  def collect(predicate: PartialFunction[A, A]): List[A] = ???
+  def zipWithValue[B](value: B): List[(A, B)] = map(h => (h, value))
+
+  def length(): Int = foldLeft(0)((acc, _) => acc + 1)
+
+  def indices(): List[Int] = foldLeft[(Int, List[Int])]((0, Nil()))((acc, _) => (acc._1 + 1, acc._2.append(acc._1 :: Nil())))._2
+
+  def zipWithIndex: List[(A, Int)] = foldRight[(Int, List[(A, Int)])]((0, Nil()))((h, acc) => (acc._1 + 1, acc._2.append((h, acc._1) :: Nil())))._2
+
+  def partition(predicate: A => Boolean): (List[A], List[A]) = (filter(predicate), filter(e => !predicate(e)))
+
+  def span(predicate: A => Boolean): (List[A], List[A]) =
+    foldLeft[(Boolean, (List[A], List[A]))]((true, (Nil(), Nil())))((acc, h) => (
+      if acc._1 then predicate(h) else false,
+      if acc._1 && predicate(h) then (acc._2._1.append(h :: Nil()), Nil()) else (acc._2._1, acc._2._2.append(h :: Nil()))
+    ))._2
+
+  def takeRight(n: Int): List[A] =
+    foldRight[(Int, List[A])]((1, Nil()))((h, acc) => (acc._1 + 1, if acc._1 <= n then h :: acc._2 else acc._2))._2
+
+  def collect(predicate: PartialFunction[A, A]): List[A] = filter(e => predicate.isDefinedAt(e)).map(e => predicate.apply(e))
+
 // Factories
 object List:
 
